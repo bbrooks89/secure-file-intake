@@ -1,0 +1,56 @@
+name: CI/CD
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # needed for OIDC login to AWS (no long-lived keys)
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Build, test, synth
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm test -- --ci
+      - run: npx cdk synth --quiet
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cdk-out
+          path: cdk.out
+          retention-days: 7
+
+  deploy:
+    name: Deploy to AWS
+    needs: test
+    # Only deploy from main, and only when the repo has been wired to an AWS role.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.AWS_DEPLOY_ROLE_ARN != ''
+    runs-on: ubuntu-latest
+    environment: dev # add a required reviewer on this environment for a manual approval gate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-1' }}
+      - run: npx cdk diff
+      - run: npx cdk deploy --require-approval never ${{ vars.ALERT_EMAIL && format('-c alertEmail={0}', vars.ALERT_EMAIL) || '' }}

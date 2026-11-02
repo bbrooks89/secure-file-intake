@@ -1,0 +1,5 @@
+member_id,first_name,last_name,dob,plan_code
+ABC12345,Ana,Lopez,1980-04-12,PPO1
+bad id!,Sam,Lee,1975-11-30,HMO2
+XYZ98765,,Lee,1975-02-30,HMO2
+ABC12345,Ana,Lopez,1980-04-12,PPO1
