@@ -84,6 +84,16 @@ aws s3 cp s3://$BUCKET/acks/acme/bad.csv.ack.json -   # see the line-level error
 
 The bad file should trigger the `FilesRejected` alarm email within about five minutes.
 
+### What it looks like
+
+CloudWatch dashboard: accepted vs. rejected files, Lambda duration (cold vs. warm), and alarm status:
+
+![Dashboard](docs/dashboard.png)
+
+A rejected file triggers the alarm and an email alert:
+
+![Alarm email](docs/alarm-email.png)
+
 **Clean up when done:**
 
 ```bash
