@@ -114,6 +114,7 @@ Deployment authenticates with **GitHub OIDC**, so no AWS access keys are stored 
 3. In the repo settings, add Actions **variables**: `AWS_DEPLOY_ROLE_ARN`, and optionally `AWS_REGION` and `ALERT_EMAIL`.
 
 Until `AWS_DEPLOY_ROLE_ARN` is set, the pipeline runs tests only and skips deployment.
+> Note: deployment in my own account runs from the CLI (`cdk deploy`) because an organization guardrail in that account blocks OIDC identity providers. The workflow's OIDC deploy job is ready for any account that allows them.
 
 ## Project layout
 
