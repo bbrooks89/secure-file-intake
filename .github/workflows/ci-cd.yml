@@ -34,6 +34,30 @@ jobs:
           path: cdk.out
           retention-days: 7
 
+  terraform:
+    name: Terraform fmt, validate, test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        working-directory: .
+      - run: npm run build:lambda
+        working-directory: .
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+      - run: terraform fmt -check -recursive
+      - run: terraform init -backend=false -input=false
+      - run: terraform validate
+      - run: terraform test
+
   deploy:
     name: Deploy to AWS
     needs: test

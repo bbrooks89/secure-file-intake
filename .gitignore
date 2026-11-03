@@ -5,3 +5,13 @@ dist/
 !jest.config.js
 *.d.ts
 .env
+
+# Terraform
+terraform/.terraform/
+terraform/.dist/
+terraform/build/
+terraform/backend.tf
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log

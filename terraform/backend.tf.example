@@ -1,0 +1,14 @@
+# Remote state: S3 for the state file, with native S3 locking (Terraform 1.10+).
+# Create the bucket once, outside this configuration, then:
+#   cp backend.tf.example backend.tf
+#   terraform init -migrate-state
+
+terraform {
+  backend "s3" {
+    bucket       = "REPLACE-with-your-state-bucket"
+    key          = "secure-file-intake/terraform.tfstate"
+    region       = "us-east-2"
+    encrypt      = true
+    use_lockfile = true
+  }
+}
